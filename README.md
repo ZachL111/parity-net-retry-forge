@@ -1,69 +1,40 @@
 # parity-net-retry-forge
 
-`parity-net-retry-forge` packages a practical networking exercise in TypeScript. The emphasis is on deterministic behavior, a small public API, and examples that explain the tradeoffs.
+`parity-net-retry-forge` keeps a focused TypeScript implementation around networking. The project goal is to design a TypeScript verification harness for retry systems, covering simulation kernel, seeded input scenarios, and failure-oriented tests.
 
-## How I Read Parity Net Retry Forge
+## Project Rationale
 
-The useful thing to inspect here is how the same score rule is represented in code, metadata, and examples. If those three pieces disagree, the audit script should make the drift visible.
+This is intentionally local and self-contained so it can be inspected without credentials, services, or seeded history.
 
-## Main Behaviors
+## Parity Net Retry Forge Review Notes
 
-- Includes extended examples for retry behavior, including `surge` and `degraded`.
-- Documents policy decisions tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-- Stores project constants and verification metadata in `metadata/project.json`.
-- Adds a repository audit script that checks structure before running the language verifier.
+The first comparison I would make is `packet span` against `packet span` because it shows where the rule is most opinionated.
 
-## Problem Shape
+## Feature Set
 
-This is not a wrapper around a service. It is a self-contained project that shows how the model behaves when demand, capacity, latency, risk, and weight move in different directions.
+- `fixtures/domain_review.csv` adds cases for packet span and retry pressure.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/parity-net-retry-walkthrough.md` walks through the case spread.
+- The TypeScript code includes a review path for `packet span` and `packet span`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
-## Repository Map
+## Architecture
 
-- `src`: primary implementation
-- `tests`: verification harness
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
-- `package.json`: Node package scripts
+The fixture data drives the tests. The code stays thin, while `metadata/domain-review.json` and `config/review-profile.json` explain what each case is meant to protect.
 
-## Internal Model
+The TypeScript addition stays small enough to inspect in one sitting.
 
-The project is organized around a compact model rather than a large framework. Inputs are scored, classified, and checked against golden fixtures. The constants live in code and are mirrored in metadata so documentation drift is easy to catch. The TypeScript project keeps types close to the model and compiles before running its checks.
-
-## How To Run It
+## Usage
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Test Command
 
-## Scenario Walkthrough
+That command is also the regression path. It verifies the domain cases and catches mismatches between the CSV, metadata, and code.
 
-`surge` is the first example I would inspect because it lands on the `accept` path with a score of 210. The broader file also keeps `degraded` at -33 and `surge` at 210, which gives the model a useful low-to-high spread.
+## Next Improvements
 
-## Validation
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
-
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Known Edges
-
-The examples cover useful edges, not every edge. A larger version would add malformed-input tests, richer reports, and deeper domain parsers.
-
-## Follow-Up Work
-
-- Split the scoring constants into a typed configuration object and validate it before use.
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add a loader for `examples/extended_cases.csv` and promote selected cases into the language test suite.
-- Add one more networking fixture that focuses on a malformed or borderline input.
-
-## Run It Locally
-
-The only required setup is the local TypeScript toolchain. After cloning, stay in the repo root so fixture paths resolve correctly.
+No external service is required. A deeper version would add more negative cases and a clearer boundary around invalid input.
